@@ -390,7 +390,7 @@ class TimmiesApp extends Component {
                         });
 
                         const gameLogPromise = gameLogSearch.get();
-                        gameLogPromise.then((response) => {
+                        gameLogPromise.then(async (response) => {
                             let gameLogSplits = response.data.stats[0].splits;
 
                             //formatted/custom data
@@ -408,53 +408,88 @@ class TimmiesApp extends Component {
                             player.fullName = fullName;
                             player.shortName = firstName.substring(0, 1) + " " + lastName;
 
-                            let playerData = {
-                                firstName: player.firstName,
-                                lastName: player.lastName,
-                                fullName: player.firstName + " " + player.lastName,
-                                shortName: firstName.substring(0, 1) + ". " + lastName,
-                                position: player.position,
-                                key: key,
-                                id: key,
-                                nhldata: basicData,
-                                statsdata : seasonStats,
-                                gamelogData: gameLogSplits,
-                                opponent: opponent,
-                                homeaway: homeaway,
-                            };
-
-                            //shallow copy of entire array
-                            let newPlayerLists = [...this.state.playerLists];
-                            let playerList = newPlayerLists[set.id - 1];
-                            playerList.players = [...playerList.players, playerData]
-
-                            //see if the player is injured
-                            if (this.state.webInjuries && !this.state.playerInjuries.find((p) => p.player === playerData.fullName)) { //it may be null if this call failed and that is OK
-                                let injury = this.state.webInjuries.find((injury) => injury.player === playerData.fullName);
-                                if (injury && playerData.fullName != 'Sebastian Aho') {
-                                    playerData.injury = injury;
+                            // get the player's gpg vs opponent
+                            let gpgVSopp = 0;
+                            const playerIdRequest = axios.create({
+                                baseURL: "http://localhost:3030/playerByName?firstName=" + player.firstName + "&lastName=" + player.lastName,
+                                withCredentials: false,
+                                headers: {
+                                    "Access-Control-Allow-Origin": "*"
                                 }
-                            }
+                            });
+                            const playerIdPromise = playerIdRequest.get();
+                            return playerIdPromise.then((response) => {
+                                var playerId = response.data.playerId;
 
-                            //see if the player is in a postponed game
-                            if (this.state.postponedGames) {
-                                if ((this.state.postponedGames.find((g) => g.teams.away.team.name === originalPlayerTeamName) ||
-                                    this.state.postponedGames.find((g) => g.teams.home.team.name === originalPlayerTeamName))
-                                    //ok so now we know this player's team is in a postponed game but maybe their team is still playing a different game
-                                    && (!this.state.games.find((g) => g.teams.away.team.name === originalPlayerTeamName && g.status.detailedState != "Postponed") &&
-                                        !this.state.games.find((g) => g.teams.home.team.name === originalPlayerTeamName && g.status.detailedState != "Postponed"))) {
-                                    console.log("postponed game for " + playerData.fullName);
-                                    playerData.postponed = true;
-                                }                                
-                            }
+                                let gpgRequest = axios.create({
+                                    baseURL: "http://localhost:3030/playerGoalsPerGameVSopponent?playerId=" + playerId + "&opp=" + opponent.teamAbbr,
+                                    withCredentials: false,
+                                    headers: {
+                                        "Access-Control-Allow-Origin": "*"
+                                    }
+                                });
+                                let gpgPromise = gpgRequest.get();
+                                gpgPromise.then((response) => {
+                                    gpgVSopp = response.data.playerGPGvsOpponent;
 
-                            if (playerData.injury) {
-                                let newInjuryList = [...this.state.playerInjuries, playerData.injury];
-                                this.setState({ playerLists: newPlayerLists, playerInjuries: newInjuryList });
-                            }
-                            else {
-                                this.setState({ playerLists: newPlayerLists });
-                            }
+                                    let playerData = {
+                                        firstName: player.firstName,
+                                        lastName: player.lastName,
+                                        fullName: player.firstName + " " + player.lastName,
+                                        shortName: firstName.substring(0, 1) + ". " + lastName,
+                                        position: player.position,
+                                        key: key,
+                                        id: key,
+                                        nhldata: basicData,
+                                        statsdata : seasonStats,
+                                        gamelogData: gameLogSplits,
+                                        opponent: opponent,
+                                        gpgVSopp: gpgVSopp,
+                                        homeaway: homeaway,
+                                    };
+        
+                                    //shallow copy of entire array
+                                    let newPlayerLists = [...this.state.playerLists];
+                                    let playerList = newPlayerLists[set.id - 1];
+                                    playerList.players = [...playerList.players, playerData];
+        
+                                    //see if the player is injured
+                                    if (this.state.webInjuries && !this.state.playerInjuries.find((p) => p.player === playerData.fullName)) { //it may be null if this call failed and that is OK
+                                        let injury = this.state.webInjuries.find((injury) => injury.player === playerData.fullName);
+                                        if (injury && playerData.fullName != 'Sebastian Aho') {
+                                            playerData.injury = injury;
+                                        }
+                                    }
+        
+                                    //see if the player is in a postponed game
+                                    if (this.state.postponedGames) {
+                                        if ((this.state.postponedGames.find((g) => g.teams.away.team.name === originalPlayerTeamName) ||
+                                            this.state.postponedGames.find((g) => g.teams.home.team.name === originalPlayerTeamName))
+                                            //ok so now we know this player's team is in a postponed game but maybe their team is still playing a different game
+                                            && (!this.state.games.find((g) => g.teams.away.team.name === originalPlayerTeamName && g.status.detailedState != "Postponed") &&
+                                                !this.state.games.find((g) => g.teams.home.team.name === originalPlayerTeamName && g.status.detailedState != "Postponed"))) {
+                                            console.log("postponed game for " + playerData.fullName);
+                                            playerData.postponed = true;
+                                        }                                
+                                    }
+        
+                                    if (playerData.injury) {
+                                        let newInjuryList = [...this.state.playerInjuries, playerData.injury];
+                                        this.setState({ playerLists: newPlayerLists, playerInjuries: newInjuryList });
+                                    }
+                                    else {
+                                        this.setState({ playerLists: newPlayerLists });
+                                    }
+                                    
+                                    return gpgVSopp;
+                                }).catch((error) => {
+                                    console.log(error);
+                                    return gpgVSopp;
+                                });
+                            }).catch((error) => {
+                                console.log(error);
+                                return gpgVSopp;
+                            });
                         }).catch((error) => {
                             console.log("Game log stats failed for " + player.firstName + " " + player.lastName + ". Error: " + error);
                         });
@@ -613,6 +648,12 @@ class TimmiesApp extends Component {
                         className: "short-stat"
                     },
                     {
+                        Header: "GPG.vs.Opp",
+                        id: "playerGPGvsOpp",
+                        accessor: "gpgVSopp",
+                        className: "short-stat"
+                    },
+                    {
                         Header: "Opp.GAA",
                         id: "playerOppGAA",
                         accessor: "opponent.goalsAgainstPerGame",
@@ -694,6 +735,12 @@ class TimmiesApp extends Component {
                         Header: "H/A",
                         id: "playerHomeaway",
                         accessor: "homeaway",
+                        className: "short-stat"
+                    },
+                    {
+                        Header: "GPG.vs.Opp",
+                        id: "playerGPGvsOpp",
+                        accessor: "gpgVSopp",
                         className: "short-stat"
                     },
                     {

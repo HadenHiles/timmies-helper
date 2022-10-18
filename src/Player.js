@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import axios from 'axios'
 
 class Player extends Component {
     constructor(props) {
@@ -17,8 +18,9 @@ class Player extends Component {
         this.getAverageTimeOnIce = this.getAverageTimeOnIce.bind(this)
         this.getGamesPlayed = this.getGamesPlayed.bind(this);
         this.getGoals = this.getGoals.bind(this);
-
         this.getOpponentGAA = this.getOpponentGAA.bind(this);
+
+        this.getGPGvsOpponent = this.getGPGvsOpponent.bind(this);
     }
 
     getGamesPlayed() {
@@ -85,6 +87,14 @@ class Player extends Component {
         }
     }
 
+    getGPGvsOpponent() {
+        if (!this.props.player.gpgVSopp) {
+            return "N/A";
+        }
+        else {
+            return this.props.player.gpgVSopp.toFixed(2);
+        }
+    }
 
     render() {
         return (
@@ -97,6 +107,7 @@ class Player extends Component {
                 <Col xs="1">{this.getPPTimeOnIce()}</Col>
                 <Col xs="1">{this.getAverageTimeOnIce()}</Col>
                 <Col xs="1">{this.getGoalsPerGame()}</Col>
+                <Col xs="1">{this.getGPGvsOpponent()}</Col>
                 <Col xs="1">{this.getOpponentGAA()}</Col>
             </Row>
             )
