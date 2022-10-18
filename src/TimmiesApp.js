@@ -556,7 +556,7 @@ class TimmiesApp extends Component {
                         className: "player-name",
                         Cell: props =>
                             <div>
-                                <img className="team-logo" src={process.env.PUBLIC_URL + "/assets/logos/" + props.row.original.nhldata.teamAbbrevs + ".png"} /> <a target="_blank" href={"https://www.nhl.com/player/" + props.row.original.key}>{props.value}</a>
+                                <img className="team-logo" src={process.env.PUBLIC_URL + "/assets/logos/" + props.row.original.nhldata.teamAbbrevs + ".png"} /> <a target="_blank" href={"https://frozenpool.dobbersports.com/players/" + props.row.original.firstName.toLowerCase() + "-" + props.row.original.lastName.toLowerCase()}>{props.value}</a>
                             </div>,
                     },
                     {
@@ -640,7 +640,7 @@ class TimmiesApp extends Component {
                         className: "player-name",
                         Cell: props =>
                             <div>
-                                <img className="team-logo" src={process.env.PUBLIC_URL + "/assets/logos/" + props.row.original.nhldata.teamAbbrevs + ".png"} /> <a target="_blank" href={"https://www.nhl.com/player/" + props.row.original.key}>{props.value}</a>
+                                <img className="team-logo" src={process.env.PUBLIC_URL + "/assets/logos/" + props.row.original.nhldata.teamAbbrevs + ".png"} /> <a target="_blank" href={"https://frozenpool.dobbersports.com/players/" + props.row.original.firstName.toLowerCase() + "-" + props.row.original.lastName.toLowerCase()}>{props.value}</a>
                             </div>,
                     },
                     {
