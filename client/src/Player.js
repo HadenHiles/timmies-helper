@@ -21,6 +21,7 @@ class Player extends Component {
         this.getOpponentGAA = this.getOpponentGAA.bind(this);
 
         this.getGPGvsOpponent = this.getGPGvsOpponent.bind(this);
+        this.getBestGuessValue = this.getBestGuessValue.bind(this);
     }
 
     getGamesPlayed() {
@@ -96,6 +97,15 @@ class Player extends Component {
         }
     }
 
+    getBestGuessValue() {
+        if (!this.props.player.gpgVSopp || (!this.props.player.nhldata || this.props.player.nhldata.gamesPlayed === 0)) {
+            return "N/A";
+        }
+        else {
+            return parseFloat((parseFloat(this.props.player.gpgVSopp) + parseFloat((parseFloat(this.props.player.nhldata.goals) / parseFloat(this.props.player.nhldata.gamesPlayed))).toFixed(2))).toFixed(2);
+        }
+    }
+
     render() {
         return (
             <Row>
@@ -108,6 +118,7 @@ class Player extends Component {
                 <Col xs="1">{this.getAverageTimeOnIce()}</Col>
                 <Col xs="1">{this.getGoalsPerGame()}</Col>
                 <Col xs="1">{this.getGPGvsOpponent()}</Col>
+                <Col xs="1">{this.getBestGuessValue()}</Col>
                 <Col xs="1">{this.getOpponentGAA()}</Col>
             </Row>
             )

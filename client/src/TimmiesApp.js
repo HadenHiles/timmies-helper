@@ -432,6 +432,8 @@ class TimmiesApp extends Component {
                                 gpgPromise.then((response) => {
                                     gpgVSopp = response.data.playerGPGvsOpponent;
 
+                                    let bestGuess = (parseFloat(gpgVSopp) + parseFloat(basicData.goalsPerGame)).toFixed(2);
+
                                     let playerData = {
                                         firstName: player.firstName,
                                         lastName: player.lastName,
@@ -445,6 +447,7 @@ class TimmiesApp extends Component {
                                         gamelogData: gameLogSplits,
                                         opponent: opponent,
                                         gpgVSopp: gpgVSopp,
+                                        bestGuessValue: bestGuess,
                                         homeaway: homeaway,
                                     };
         
@@ -654,6 +657,12 @@ class TimmiesApp extends Component {
                         className: "short-stat"
                     },
                     {
+                        Header: "Best Guess",
+                        id: "hadensBestGuess",
+                        accessor: "bestGuessValue",
+                        className: "short-stat"
+                    },
+                    {
                         Header: "Opp.GAA",
                         id: "playerOppGAA",
                         accessor: "opponent.goalsAgainstPerGame",
@@ -741,6 +750,12 @@ class TimmiesApp extends Component {
                         Header: "GPG.vs.Opp",
                         id: "playerGPGvsOpp",
                         accessor: "gpgVSopp",
+                        className: "short-stat"
+                    },
+                    {
+                        Header: "Best Guess",
+                        id: "hadensBestGuess",
+                        accessor: "bestGuessValue",
                         className: "short-stat"
                     },
                     {
