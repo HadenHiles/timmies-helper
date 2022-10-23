@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { instanceOf } from "prop-types"
 import PlayerLists from './PlayerLists'
 import Warnings from './Warnings';
 import teamData from './data/teams.json'
@@ -593,7 +592,7 @@ class TimmiesApp extends Component {
                         className: "player-name",
                         Cell: props =>
                             <div>
-                                <img className="team-logo" src={process.env.PUBLIC_URL + "/assets/logos/" + props.row.original.nhldata.teamAbbrevs + ".png"} /> <a target="_blank" href={"https://frozenpool.dobbersports.com/players/" + props.row.original.firstName.toLowerCase() + "-" + props.row.original.lastName.toLowerCase()}>{props.value}</a>
+                                <img className="team-logo" src={process.env.PUBLIC_URL + "/assets/logos/" + props.row.original.nhldata.teamAbbrevs + ".png"} alt="dobbersports-playerprofile" /> <a target="_blank" rel="noreferrer" href={"https://frozenpool.dobbersports.com/players/" + props.row.original.firstName.toLowerCase() + "-" + props.row.original.lastName.toLowerCase()}>{props.value}</a>
                             </div>,
                     },
                     {
