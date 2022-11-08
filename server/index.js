@@ -60,7 +60,7 @@ app.get('/playerGoalsPerGameVSopponent', (req, res) => {
     rp(dobberVSopponentUrl).then((html) => {
         const $ = cheerio.load(html);
         var gamesPlayed = parseInt($($("h3.text-center:contains('Stats vs Opponent')").next().find("table#opponentStats > tbody > tr:first-child > td:nth-child(1)")).text());
-        var gamesPlayed = gamesPlayed ? gamesPlayed : 0;
+        var gamesPlayed = (gamesPlayed && gamesPlayed > 1) ? gamesPlayed : 0;
         var goals = parseInt($($("h3.text-center:contains('Stats vs Opponent')").next().find("table#opponentStats > tbody > tr:first-child > td:nth-child(2)")).text());
         var goals = goals ? goals : 0;
         var gpg = (gamesPlayed != 0 && goals != 0) ? (Math.round(((goals / gamesPlayed)) * 100) / 100).toFixed(2) : 0.00;
