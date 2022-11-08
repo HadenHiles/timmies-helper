@@ -13,6 +13,17 @@ app.get('/', (req, res) => {
 app.get('/playerByName/', (req, res) => {
     var firstName = req.query.firstName.toLowerCase();
     var lastName = req.query.lastName.toLowerCase();
+    switch (firstName) {
+        case "mitch":
+            firstName = "mitchell";
+            break;
+        case "jake":
+            firstName = "jacob";
+            break;
+        default:
+            firstName = firstName;
+    }
+
     var dobberPlayerProfileUrl = "https://frozenpool.dobbersports.com/players/" + firstName + "-" + lastName;
 
     rp(dobberPlayerProfileUrl).then((html) => {
@@ -33,14 +44,28 @@ app.get('/playerByName/', (req, res) => {
 app.get('/playerGoalsPerGameVSopponent', (req, res) => {
     var playerId = req.query.playerId;
     var abbrOpponent = req.query.opp.toUpperCase();
-    var dobberVSopponentUrl = "https://frozenpool.dobbersports.com/frozenpool_playeropponent.php?player=" + playerId + "&opponent=" + abbrOpponent + "&games=ALL%3A10";
+    switch (abbrOpponent) {
+        case "TBL":
+            abbrOpponent = "T.B";
+            break;
+        case "NJD":
+            abbrOpponent = "N.J";
+            break;
+        default:
+            abbrOpponent = abbrOpponent;
+    }
 
+    var dobberVSopponentUrl = "https://frozenpool.dobbersports.com/frozenpool_playeropponent.php?player=" + playerId + "&opponent=" + abbrOpponent + "&games=ALL%3A10";
+    
     rp(dobberVSopponentUrl).then((html) => {
         const $ = cheerio.load(html);
-        var statsVSopp = $("#opponentStats_wrapper:first-child table#opponentStats:first-child");
-        var gamesPlayed = parseInt($($($('tbody > tr:first-child > td:nth-child(1)')).first(), statsVSopp.first()).text());
-        var goals = parseInt($($($('tbody > tr:first-child > td:nth-child(2)')).first(), statsVSopp.first()).text());
-        var gpg = (Math.round(((goals / gamesPlayed)) * 100) / 100).toFixed(2);
+        var gamesPlayed = parseInt($($("h3.text-center:contains('Stats vs Opponent')").next().find("table#opponentStats > tbody > tr:first-child > td:nth-child(1)")).text());
+        var gamesPlayed = gamesPlayed ? gamesPlayed : 0;
+        var goals = parseInt($($("h3.text-center:contains('Stats vs Opponent')").next().find("table#opponentStats > tbody > tr:first-child > td:nth-child(2)")).text());
+        var goals = goals ? goals : 0;
+        var gpg = (gamesPlayed != 0 && goals != 0) ? (Math.round(((goals / gamesPlayed)) * 100) / 100).toFixed(2) : 0.00;
+
+        // console.log("opp: " + abbrOpponent + "\nid: " + playerId + "\n" + "GPG: " + gpg + "\n" + "Games Played: " + gamesPlayed + "\n" + "Goals: " + goals + "\n\n");
 
         res.json({
             dobberUrl: dobberVSopponentUrl,
