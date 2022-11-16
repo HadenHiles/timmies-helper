@@ -51,6 +51,9 @@ app.get('/playerGoalsPerGameVSopponent', (req, res) => {
         case "NJD":
             abbrOpponent = "N.J";
             break;
+        case "LAK":
+            abbrOpponent = "L.A";
+            break;
         default:
             abbrOpponent = abbrOpponent;
     }
